@@ -22,6 +22,7 @@ Server::Server(int portNumber, std::string password)
     this->portNumber = portNumber;
     this->password = password;
 
+    // Validation for password and portNumber
     if (password_checker(this->password))
     {
         std::cout << "input password invaild" << std::endl;
@@ -37,6 +38,7 @@ Server::Server(int portNumber, std::string password)
     if (this->kque == -1)
         throw std::runtime_error("kqueue error");
 
+    // Setting pointers in Client class to this server instance
     Client::setServerPtr(this);
     Channel::setServerPtr(this);
 }
@@ -46,25 +48,28 @@ void Server::openSocket()
     sockaddr_in serverAddr;
 
     this->serverSocket = socket(AF_INET, SOCK_STREAM, 0);
+    // Creating a socket
     if (this->serverSocket == -1)
         throw std::runtime_error("socket error");
 
+    // Setting up server address structure
     bzero(&serverAddr, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr =
         htonl(INADDR_ANY);
     serverAddr.sin_port = htons(this->portNumber);
 
-    
+    // Setting socket options
     int option = 1;
     setsockopt(this->serverSocket, SOL_SOCKET, SO_REUSEADDR, &option,
                sizeof(option));
 
-    
+    // Binding the socket to the address
     if (bind(this->serverSocket,
              reinterpret_cast<const sockaddr *>(&serverAddr),
              sizeof(serverAddr)) == -1)
         throw std::runtime_error("bind error");
+    // Listening for incoming connections
     listen(this->serverSocket, LISTEN_BACKLOG_NUM); 
                                                     
 }
@@ -73,6 +78,7 @@ void Server::init()
 {
     struct kevent event;
 
+    // Adding the server socket to the kqueue for monitoring read events
     EV_SET(&event, this->serverSocket, EVFILT_READ, EV_ADD, 0, 0, NULL);
     if (kevent(this->kque, &event, 1, NULL, 0, NULL) == -1)
         throw std::runtime_error("kevent attach error");
@@ -80,6 +86,7 @@ void Server::init()
 
 Server::~Server()
 {
+    // Closing server socket and kqueue
     close(serverSocket);
     close(kque);
 }
@@ -124,6 +131,11 @@ void Server::run()
 
 void Server::handleNewConnection(int sockFd)
 {
+    // Handling a new connection, accepting the connection and configuring kqueue for the new socket
+    // Also creating a new Client object for the connection
+    // Adding the client to the socketFdToClient map
+    // Outputting a message to indicate a new connection
+
     struct sockaddr_in client_addr;
     struct kevent event;
     int client_addr_size = sizeof(client_addr);
@@ -148,6 +160,7 @@ void Server::handleNewConnection(int sockFd)
 
 void Server::handleExistingConnection_send_client(int fd)
 {
+    // Handling an existing connection for sending data to the client
     socketFdToClient[fd].sendData();
 }
 
@@ -156,6 +169,10 @@ void Server::handleExistingConnection_send_client(int fd)
 
 void Server::handleExistingConnection(int sockFd, struct kevent event)
 {
+    // Handling an existing connection for reading data from the client
+    // Checking if the connection is still valid
+    // Outputting information about the client and processing received messages
+
     if (isConnected(event) == false)
     {
         this->terminateConnection(sockFd);
@@ -183,6 +200,8 @@ void Server::handleExistingConnection(int sockFd, struct kevent event)
 
 bool Server::isConnected(struct kevent event)
 {
+    // Checking if a connection is still valid based on event flags
+
     if (event.flags & EV_EOF)
     {
         return false;
@@ -192,6 +211,9 @@ bool Server::isConnected(struct kevent event)
 
 void Server::terminateConnection(int fd)
 {
+    // Terminating a connection, removing the client from associated channels
+    // Deleting the client from maps and closing the socket
+
     std::map<std::string, Channel>::iterator iterCh = this->channel.begin();
     std::string &nickname = socketFdToClient[fd].getNickname();
     std::vector<std::string> channelNamestoDelete;
@@ -226,6 +248,9 @@ void Server::terminateConnection(int fd)
 
 void Server::execCommand(Message message)
 {
+    // Executing a command received from a client based on the message type
+    // Commands include PASS, NICK, USER, PRIVMSG, PING, JOIN, PART, KICK, TOPIC, INVITE, MODE, QUIT
+
     Command &command = Command::getInstance(*this);
     Client &client = socketFdToClient[message.getSocket()];
 
@@ -271,6 +296,7 @@ int Server::getKque() const { return kque; }
 
 Client &Server::getClientByNickname(const std::string &nickname)
 {
+    // Getting a client object by nickname
     std::map<std::string, int>::iterator iter =
         nicknameToSocketFd.find(nickname);
 
@@ -279,11 +305,13 @@ Client &Server::getClientByNickname(const std::string &nickname)
 
 std::map<std::string, int> &Server::getNicknameToSocketFd()
 {
+    // Getting the nicknameToSocketFd map
     return nicknameToSocketFd;
 }
 
 std::map<int, Client> &Server::getSocketFdToClient()
 {
+    // Getting the socketFdToClient map
     return socketFdToClient;
 }
 

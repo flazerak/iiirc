@@ -8,6 +8,7 @@ Channel::~Channel() {}
 
 Channel::Channel(const std::string &name) : name(name)
 {
+    // Initialization of member variables
     this->topic = "";
     this->key = "";
     this->memberLimit = 0;
@@ -17,16 +18,19 @@ Channel::Channel(const std::string &name) : name(name)
 
 void Channel::setMembers(const std::string &nickname, const int operator_check)
 {
+    // Setting the members map with the provided nickname and operator_check
     this->members[nickname] = operator_check;
 }
 
 void Channel::inviteNewMember(std::string nickname)
 {
+    // Adding a nickname to the list of invited members
     invitedNickname.insert(nickname);
 }
 
 bool Channel::isInvited(std::string nickname)
 {
+    // Adding a nickname to the list of invited members
     if (invitedNickname.find(nickname) != invitedNickname.end())
         return true;
     else
@@ -35,6 +39,7 @@ bool Channel::isInvited(std::string nickname)
 
 void Channel::deleteMemberFromInvitedList(std::string nickname)
 {
+    // Deleting a nickname from the list of invited members
     if (isInvited(nickname))
         invitedNickname.erase(nickname);
 }
@@ -67,6 +72,7 @@ void Channel::setMODE_T(bool mode)
 
 void Channel::broadcasting(std::string fromNickname, Message &message)
 {
+    // Broadcasting a message to all channel members except the sender
     std::map<std::string, int>::iterator iter = this->members.begin();
 
     while (iter != members.end())
@@ -84,11 +90,15 @@ void Channel::broadcasting(std::string fromNickname, Message &message)
 
 void Channel::setServerPtr(Server *server_ptr)
 {
+    // Setting the server pointer for the Channel class
+
     serverPtr = server_ptr;
 }
 
 bool Channel::isMember(const std::string& nickname)
 {
+    /// Checking if a nickname is a member of the channel
+
     if (members.find(nickname) != members.end())
         return true;
     else
@@ -97,6 +107,7 @@ bool Channel::isMember(const std::string& nickname)
 
 bool Channel::isNoOperator()
 {
+    // Checking if the channel has no operators
     std::map<std::string, int>::iterator iter = members.begin();
 
     while (iter != members.end())
@@ -110,6 +121,7 @@ bool Channel::isNoOperator()
 
 void Channel::partAll()
 {
+    // Sending PART messages to all channel members when the channel is closed
     std::map<std::string, int>::iterator iter = members.begin();
     while (iter != members.end())
     {

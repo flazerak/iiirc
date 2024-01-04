@@ -5,6 +5,7 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <stdexcept>
+#include <map>
 #include <string>
 #include <sys/event.h>
 #include <sys/socket.h>
@@ -14,7 +15,6 @@
 #include <arpa/inet.h>
 
 #include <list>
-#include <map>
 
 #include "../inc/Channel.hpp"
 #include "../inc/Client.hpp"

@@ -1,5 +1,6 @@
 #include "../inc/Message.hpp"
 
+
 Message::Message(int socket, std::string msg)
 : socket(socket)
 {
@@ -10,6 +11,8 @@ Message::~Message() {}
 
 std::vector<std::string> split(std::string input, char delimiter)
 {
+    // Function to split a string into a vector of strings based on a delimiter
+    // Uses a stringstream to tokenize the input string
     std::vector<std::string> answer;
     std::stringstream ss(input);
     std::string temp;
@@ -21,9 +24,10 @@ std::vector<std::string> split(std::string input, char delimiter)
     return answer;
 }
 
-// trim from right
-std::string& rtrim(std::string& s, const char* t = " \t\n\r\f\v")
+std::string& rtrim(std::string& s, const char* t = " \t\n\r\f\v") 
 {
+    // Function to trim whitespace from the right of a string
+    // Erases characters in the provided set (default is whitespace) from the end of the string
     s.erase(s.find_last_not_of(t) + 1);
     return s;
 }
@@ -50,6 +54,11 @@ int	Message::getSocket()
 
 void Message::parse(std::string msg)
 {
+    //responsible for parsing the input message,
+    //trims leading and trailing whitespaces from the message,
+    //splits it into a vector of strings using space as the delimiter,
+    //and then extracts the prefix, command, and arguments from the split parts
+    
     rtrim(msg);
 
 	std::vector<std::string> msg_split;
