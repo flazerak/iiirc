@@ -9,7 +9,7 @@ bool Server::password_checker(const std::string &str)
     {
         return (true);
     }
-    size_t i = 0
+    size_t i = 0;
     while (i < str.length())
     {
         if ((std::isspace(str[i])) || !std::isprint(str[i]))
@@ -232,7 +232,7 @@ void Server::terminateConnection(int fd)
         iterCh++;
     }
     size_t i = 0;
-    for ( i < channelNamestoDelete.size())
+    while ( i < channelNamestoDelete.size())
     {
         this->channel[channelNamestoDelete[i]].partAll();
         this->channel.erase(channelNamestoDelete[i]);
