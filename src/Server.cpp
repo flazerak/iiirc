@@ -61,13 +61,10 @@ void Server::openSocket()
 
     // Setting socket options
     int option = 1;
-    setsockopt(this->serverSocket, SOL_SOCKET, SO_REUSEADDR, &option,
-               sizeof(option));
+    setsockopt(this->serverSocket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
     // Binding the socket to the address
-    if (bind(this->serverSocket,
-             reinterpret_cast<const sockaddr *>(&serverAddr),
-             sizeof(serverAddr)) == -1)
+    if (bind(this->serverSocket, reinterpret_cast<const sockaddr *>(&serverAddr), sizeof(serverAddr)) == -1)
         throw std::runtime_error("bind error");
     // Listening for incoming connections
     listen(this->serverSocket, LISTEN_BACKLOG_NUM); 
