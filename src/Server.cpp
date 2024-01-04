@@ -4,15 +4,17 @@ Server::Server() {}
 
 bool Server::password_checker(const std::string &str)
 {
+    //password validation function
     if (str.empty())
     {
         return (true);
     }
-    
-    for (size_t i = 0; i < str.length(); i++)
+    size_t i = 0
+    while (i < str.length())
     {
         if ((std::isspace(str[i])) || !std::isprint(str[i]))
             return (true);
+        i++;
     }
     return (false);
 }
@@ -95,10 +97,10 @@ void Server::run()
         struct kevent events[32];
         int triggered = kevent(this->kque, NULL, 0, events, 32, NULL);
         try
-        {
+        {   int i = 0;
             if (triggered == -1)
                 throw std::runtime_error("kevent event error");
-            for (int i = 0; i < triggered; i++)
+            while ( i < triggered)
             {
                 if ((int)events[i].ident ==
                     this->serverSocket) 
@@ -117,6 +119,7 @@ void Server::run()
                         handleExistingConnection_send_client(events[i].ident);
                     }
                 }
+                i++;
             }
         }
         catch (const std::exception &e)
@@ -181,7 +184,8 @@ void Server::handleExistingConnection(int sockFd, struct kevent event)
               << std::endl;
 
     std::vector<Message> messages = this->socketFdToClient[sockFd].readData();
-    for (size_t i = 0; i < messages.size(); i++)
+    size_t i = 0;
+    while ( i < messages.size())
     {
         try
         {
@@ -192,6 +196,7 @@ void Server::handleExistingConnection(int sockFd, struct kevent event)
             std::cout << e.what() << std::endl;
             break;
         }
+        i++;
     }
 }
 
@@ -214,7 +219,7 @@ void Server::terminateConnection(int fd)
     std::map<std::string, Channel>::iterator iterCh = this->channel.begin();
     std::string &nickname = socketFdToClient[fd].getNickname();
     std::vector<std::string> channelNamestoDelete;
-    for (; iterCh != channel.end(); iterCh++)
+    while ( iterCh != channel.end())
     {
         Channel &mini_channel = iterCh->second;
         std::map<std::string, int> &members = mini_channel.getMembers();
@@ -224,11 +229,14 @@ void Server::terminateConnection(int fd)
             if (mini_channel.isNoOperator())
                 channelNamestoDelete.push_back(iterCh->first);
         }
+        iterCh++;
     }
-    for (size_t i = 0; i < channelNamestoDelete.size(); i++)
+    size_t i = 0;
+    for ( i < channelNamestoDelete.size())
     {
         this->channel[channelNamestoDelete[i]].partAll();
         this->channel.erase(channelNamestoDelete[i]);
+        i++;
     }
 
    

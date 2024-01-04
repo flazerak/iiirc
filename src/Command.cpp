@@ -290,8 +290,8 @@ void Command::join_RPL_ENDOFNAMES_366(Message &message, std::string channelName)
                       channelName + " :End of /NAMES list.";
     serverInstance->getSocketFdToClient()[message.getSocket()].sendMessage(ret);
 }
-
-//----command--//
+//
+//command
 
 void Command::pass(Message &message)
 {
@@ -428,8 +428,7 @@ void Command::privmsg(Message &message)
 
         int socketToSend = nicknameToSocketFd[receiver];
         Client &clientToSend = socketFdToClient[socketToSend];
-        Message messageToBeSent = Message(socketToSend, fromClient.makePrefix(),
-                                          "PRIVMSG", textToBeSent);
+        Message messageToBeSent = Message(socketToSend, fromClient.makePrefix(), "PRIVMSG", textToBeSent);
         clientToSend.sendMessage(messageToBeSent);
     }
 }
@@ -465,7 +464,7 @@ int Command::joinChannelNameCheck(std::string name)
     int index = 0;
     while (name[index])
     {
-        if (isspace(name[index] != 0) || name[index] == 7 || name[index] == ',')
+        if (isspace(name[index] != 0) || name[index] == ',' || name[index] == 7)
             return false;
         index++;
     }

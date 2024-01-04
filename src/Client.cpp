@@ -137,13 +137,11 @@ void Client::sendData()
     sentLength = send(socket, outBuffer.c_str(), outBuffer.size(), MSG_DONTWAIT);
 
     if (sentLength < 0) // send error
-    {
         throw std::runtime_error("send error");
-    }
+
     else if (sentLength != (ssize_t)outBuffer.size())
-    {
         this->outBuffer.erase(0, sentLength);
-    }
+    
     else 
     {
         std::cout << YELLOW << outBuffer << NC << std::endl;
